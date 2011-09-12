@@ -71,7 +71,7 @@ var Yatzee = {
 
             switch (field[1]) {
             case 'input':
-                $('<input />').attr('id', id).appendTo($rows[i]).wrap('<td />');
+                $('<input type="number" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
                 break;
             case 'fixed':
                 $('<input type="checkbox" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
