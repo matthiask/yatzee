@@ -71,7 +71,7 @@ var Yatzee = {
 
             switch (field[1]) {
             case 'input':
-                $('<input type="number" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
+                $('<input type="number" min="0" inputmode="numeric" pattern="[0-9]*" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
                 break;
             case 'fixed':
                 $('<input type="checkbox" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
@@ -116,6 +116,8 @@ var Yatzee = {
 
 $(function() {
     Yatzee.init_body();
+    Yatzee.init_player();
+    Yatzee.init_player();
     $('#y').delegate('input', 'change', Yatzee.recalculate);
 });
 </script>
