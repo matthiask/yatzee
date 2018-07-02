@@ -3,6 +3,7 @@
 <head>
 <title>Yatzee</title>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="jquery-1.5.1.min.js"></script>
 <script>
 var Yatzee = {
@@ -19,15 +20,15 @@ var Yatzee = {
         ['2 Paare', 'input'],
         ['3 Gleiche', 'input'],
         ['4 Gleiche', 'input'],
-        //['Full House', 'fixed', 25],
-        //['Kleine Strasse', 'fixed', 30],
-        //['Grosse Strasse', 'fixed', 40],
-        ['Full House', 'input'],
-        ['Kleine Strasse', 'input'],
-        ['Grosse Strasse', 'input'],
+        ['Full House', 'fixed', 25],
+        ['Kleine Strasse', 'fixed', 30],
+        ['Grosse Strasse', 'fixed', 40],
+        // ['Full House', 'input'],
+        // ['Kleine Strasse', 'input'],
+        // ['Grosse Strasse', 'input'],
         ['Chance', 'input'],
-        //['Yatzee', 'fixed', 50],
-        ['Yatzee', 'input'],
+        ['Yatzee', 'fixed', 50],
+        // ['Yatzee', 'input'],
         ['Total', 'calc', 'calculate_total'],
         ],
 
@@ -63,7 +64,7 @@ var Yatzee = {
             $rows = $body.children(),
             count = Yatzee.player_count++;
 
-        $y.find('thead tr').append('<th scope="col"><input /></th>');
+        $y.find('thead tr').append('<th scope="col"><input type="text" /></th>');
         $y.find('tfoot tr').append('<td>0</td>');
 
         for (var i=0; i<Yatzee.fields.length; i++) {
@@ -126,11 +127,38 @@ $(function() {
 body,
 input,
 button {
-    font-size: 20px;
+    font-size: 18px;
     font-family: Helvetica, sans-serif;
 }
-input {
-    width: 80px;
+table {
+    max-width: 100%;
+}
+td, th {
+    vertical-align: middle;
+    text-align: left;
+    margin: 0;
+    padding: 3px;
+    min-height: 30px;
+}
+tbody tr:nth-child(2n) {
+    background: #eee;
+}
+input[type="number"],
+input[type="text"] {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    width: 100%;
+    border-bottom: 1px solid #bbb;
+    border-radius: 0;
+
+     -moz-appearance: textfield;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 </style>
 </head>
