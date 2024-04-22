@@ -4,125 +4,6 @@
 <title>Yatzee</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="jquery-1.5.1.min.js"></script>
-<script>
-var Yatzee = {
-    fields: [
-        ['1er', 'input'],
-        ['2er', 'input'],
-        ['3er', 'input'],
-        ['4er', 'input'],
-        ['5er', 'input'],
-        ['6er', 'input'],
-        ['Summe', 'calc', 'calculate_sum'],
-        ['Bonus', 'calc', 'calculate_bonus'],
-        ['1 Paar', 'input'],
-        ['2 Paare', 'input'],
-        ['3 Gleiche', 'input'],
-        ['4 Gleiche', 'input'],
-        // ['Full House', 'fixed', 25],  // TODO add "canceling" of lines
-        // ['Kleine Strasse', 'fixed', 30],
-        // ['Grosse Strasse', 'fixed', 40],
-        ['Full House', 'input'],
-        ['Kleine Strasse', 'input'],
-        ['Grosse Strasse', 'input'],
-        ['Chance', 'input'],
-        // ['Yatzee', 'fixed', 50],
-        ['Yatzee', 'input'],
-        ['Total', 'calc', 'calculate_total'],
-        ],
-
-    calculate_sum: function(values) {
-        value = 0;
-        for (var i=0; i<6; i++)
-            value += values[i];
-        return value;
-    },
-
-    calculate_bonus: function(values) {
-        return values[6] >= 63 ? 35 : 0;
-    },
-
-    calculate_total: function(values) {
-        value = 0;
-        for (var i=6; i<Yatzee.fields.length - 1; i++)
-            value += values[i];
-        return value;
-    },
-
-    init_body: function() {
-        var $body = $('#y tbody');
-        for (var i=0; i<Yatzee.fields.length; i++) {
-            $('<th scope="row" />').text(Yatzee.fields[i][0]).appendTo($body).wrap('<tr />');
-        }
-    },
-
-    player_count: 0,
-    init_player: function() {
-        var $y = $('#y'),
-            $body = $y.find('tbody'),
-            $rows = $body.children(),
-            count = Yatzee.player_count++;
-
-        $y.find('thead tr').append('<th scope="col"><input type="text" /></th>');
-        $y.find('tfoot tr').append('<td>0</td>');
-
-        for (var i=0; i<Yatzee.fields.length; i++) {
-            var field = Yatzee.fields[i],
-                id = 'field-' + count + '-' + i;
-
-            switch (field[1]) {
-            case 'input':
-                $('<input type="number" min="0" inputmode="numeric" pattern="[0-9]*" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
-                break;
-            case 'fixed':
-                $('<input type="checkbox" />').attr('id', id).appendTo($rows[i]).wrap('<td />');
-                break;
-            default:
-                $('<td>').attr('id', id).text('0').appendTo($rows[i]);
-                break;
-            };
-        }
-    },
-
-    recalculate: function() {
-        for (var player=0; player<Yatzee.player_count; player++) {
-            var values = [];
-
-            for (var i=0; i<Yatzee.fields.length; i++) {
-                var field = Yatzee.fields[i],
-                    id = 'field-' + player + '-' + i,
-                    $field = $('#' + id),
-                    value = 0;
-
-                switch (field[1]) {
-                case 'input':
-                    if ($field.val() && parseInt($field.val()))
-                        value = parseInt($field.val(), 10);
-                    break;
-                case 'fixed':
-                    if ($field.is(':checked'))
-                        value = field[2];
-                    break;
-                case 'calc':
-                    value = Yatzee[field[2]](values);
-                    $field.html(value);
-                    break;
-                }
-                values.push(value);
-            }
-        }
-    }
-};
-
-
-$(function() {
-    Yatzee.init_body();
-    Yatzee.init_player();
-    Yatzee.init_player();
-    $('#y').delegate('input', 'change', Yatzee.recalculate);
-});
-</script>
 <style>
 body,
 input,
@@ -140,6 +21,9 @@ td, th {
     padding: 3px;
     min-height: 30px;
 }
+td {
+    text-align: right;
+}
 tbody tr:nth-child(2n) {
     background: #eee;
 }
@@ -152,6 +36,7 @@ input[type="text"] {
     width: 100%;
     border-bottom: 1px solid #bbb;
     border-radius: 0;
+    text-align: right;
 
      -moz-appearance: textfield;
 }
@@ -163,12 +48,157 @@ input[type=number]::-webkit-outer-spin-button {
 </style>
 </head>
 <body>
-    <table id="y">
-        <thead>
-            <tr><th scope="col"><h1>Yatzee</h1></th></tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <button type="button" onclick="Yatzee.init_player()">Add player</button>
+<table id="y">
+    <thead>
+        <tr><th scope="col"><h1>Yatzee</h1></th></tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<button type="button" onclick="Yatzee.initPlayer()">Add player</button>
+
+<script>
+const crel = (tagName, attributes = null, children = []) => {
+  const dom = document.createElement(tagName)
+  if (attributes) {
+    for (let [name, value] of Object.entries(attributes)) {
+      if (/^data-|^aria-|^role/.test(name)) dom.setAttribute(name, value)
+      else dom[name] = value
+    }
+  }
+  for (let child of children) {
+    dom.append(child)
+  }
+  return dom
+}
+
+const Yatzee = {
+    fields: [
+        ["1er", "input"],
+        ["2er", "input"],
+        ["3er", "input"],
+        ["4er", "input"],
+        ["5er", "input"],
+        ["6er", "input"],
+        ["Summe", "calc", "calculateSum"],
+        ["Bonus", "calc", "calculateBonus"],
+        ["1 Paar", "input"],
+        ["2 Paare", "input"],
+        ["3 Gleiche", "input"],
+        ["4 Gleiche", "input"],
+        ["Full House (25)", "fixed", 25],  
+        ["Kleine Strasse (30)", "fixed", 30],
+        ["Grosse Strasse (40)", "fixed", 40],
+        ["Chance", "input"],
+        ["Yatzee (50)", "fixed", 50],
+        ["Total", "calc", "calculateTotal"],
+        ],
+
+    players: [],
+
+    calculateSum: function(values) {
+        value = 0;
+        for (var i=0; i<6; i++)
+            value += values[i];
+        return value;
+    },
+
+    calculateBonus: function(values) {
+        return values[6] >= 63 ? 35 : 0;
+    },
+
+    calculateTotal: function(values) {
+        value = 0;
+        for (var i=6; i<Yatzee.fields.length - 1; i++)
+            value += values[i];
+        return value;
+    },
+
+    initBody: function() {
+        var tbody = document.querySelector('#y tbody');
+        for (const field of Yatzee.fields) {
+            const tr = crel("tr")
+            const th = crel("th", { textContent: field[0] })
+            tr.append(th)
+            tbody.append(tr)
+        }
+    },
+
+    initPlayer: function() {
+        const $y = document.querySelector('#y')
+        const $body = $y.querySelector('tbody')
+        const $rows = Array.from($body.children)
+
+        let player = {inputs: []}
+        Yatzee.players.push(player)
+
+        $y.querySelector("thead tr").append(
+            crel("th", { scope: "col" }, [crel("input", { type: "text" })])
+        )
+
+        for (var i=0; i<Yatzee.fields.length; i++) {
+            var field = Yatzee.fields[i]
+
+            switch (field[1]) {
+                case "input": {
+                    const input = crel(
+                        "input",
+                        { type: "number", min: 0, inputmode: "numeric", pattern: "[0-9]*" },
+                    )
+                    $rows[i].append(crel("td", {}, [input]))
+                    player.inputs[i] = input
+                    break
+                }
+                case "fixed": {
+                    const input = crel("input", { type: "checkbox" })
+                    $rows[i].append(crel("td", {}, [input]))
+                    player.inputs[i] = input
+                    break;
+                }
+                default: {
+                    const input = crel("td", { textContent: "0" })
+                    $rows[i].append(input)
+                    player.inputs[i] = input
+                    break;
+                }
+            };
+        }
+    },
+
+    recalculate: function() {
+        for (var i=0; i<Yatzee.players.length; ++i) {
+            const player = Yatzee.players[i]
+            var values = [];
+
+            for (var j=0; j<Yatzee.fields.length; j++) {
+                var field = Yatzee.fields[j]
+                var input = player.inputs[j],
+                    value = 0;
+
+                switch (field[1]) {
+                case "input":
+                    if (input.value && parseInt(input.value))
+                        value = parseInt(input.value, 10);
+                    break;
+                case "fixed":
+                    if (input.checked) {
+                        value = field[2]
+                    }
+                    break;
+                case "calc":
+                    value = Yatzee[field[2]](values);
+                    input.textContent = value
+                    break;
+                }
+                values.push(value);
+            }
+        }
+    }
+};
+
+Yatzee.initBody();
+Yatzee.initPlayer();
+Yatzee.initPlayer();
+document.querySelector("#y").addEventListener("input", Yatzee.recalculate)
+</script>
 </body>
 </html>
