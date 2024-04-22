@@ -13,6 +13,7 @@ button {
 }
 table {
     max-width: 100%;
+    margin-bottom: 1rem;
 }
 td, th {
     vertical-align: middle;
@@ -132,7 +133,7 @@ const Yatzee = {
         Yatzee.players.push(player)
 
         $y.querySelector("thead tr").append(
-            crel("th", { scope: "col" }, [crel("input", { type: "text" })])
+            crel("th", { scope: "col", style: "width: 10rem" }, [crel("input", { type: "text" })])
         )
 
         for (var i=0; i<Yatzee.fields.length; i++) {
